@@ -172,6 +172,9 @@ Failure to do so will result in frustration and keyboard tossing.
 	define( 'PONYDOCS_CACHE_ENABLED', TRUE );
 
 	define( 'PONYDOCS_DEBUG', FALSE );
+	
+	// Temp directory
+	define( 'PONYDOCS_TEMP_DIR', '/tmp/');
 
 	// Category cache expiration in seconds
 	define( 'CATEGORY_CACHE_TTL', 300 );

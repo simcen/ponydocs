@@ -300,7 +300,7 @@ class PonyDocsTOC
 					$baseTopic = $matches[1];
 
 					$title_suffix = preg_replace( '/([^' . str_replace( ' ', '', Title::legalChars() ) . '])/', '', $baseTopic );
-					$title = PONYDOCS_DOCUMENTATION_PREFIX . "$selectedProduct:$selectedManual:$title_suffix";
+					$title = PONYDOCS_DOCUMENTATION_NAMESPACE_NAME . ":$selectedProduct:$selectedManual:$title_suffix";
 					$newTitle = PonyDocsTopic::GetTopicNameFromBaseAndVersion( $title, $selectedProduct );
 
 					/**
@@ -353,6 +353,7 @@ class PonyDocsTOC
 
 		$currentIndex = -1;
 		$start = array();
+
 		// Go through and determine start, prev, next and current elements.
 
 		foreach ( $toc as $idx => &$entry ) {
@@ -439,7 +440,7 @@ class PonyDocsTOC
 		 */
 		
 		// Last but not least, get the manual description if there is one.
-		if ( preg_match( '/{{#manualDescription:([^}]*)}}/', $this->pTOCArticle->mContent, $matches ) ) {
+		if ( is_object($this->pTOCArticle) && preg_match( '/{{#manualDescription:([^}]*)}}/', $this->pTOCArticle->mContent, $matches ) ) {
 			$this->mManualDescription = $matches[1];
 		}
 

@@ -5,7 +5,7 @@ if ( !defined( 'MEDIAWIKI' ) ) {
 /**
  * Class to manage product versions in PonyDocs MediaWiki. 
  * Each instance represents a defined product version based on the
- * PONYDOCS_DOCUMENTATION_PREFIX . [ProductShortName] . PONYDOCS_PRODUCTVERSION_SUFFIX special page.
+ * PONYDOCS_DOCUMENTATION_NAMESPACE_NAME  . ':' . [ProductShortName] . PONYDOCS_PRODUCTVERSION_SUFFIX special page.
  * It also statically contains the complete list of defined versions per product and their mappings.
  */
 class PonyDocsProductVersion {
@@ -342,10 +342,12 @@ class PonyDocsProductVersion {
 
 		self::$sVersionList[$productName] = array();
 		
-		$title = Title::newFromText( PONYDOCS_DOCUMENTATION_PREFIX . $productName . PONYDOCS_PRODUCTVERSION_SUFFIX );
+		$title = Title::newFromText( PONYDOCS_DOCUMENTATION_NAMESPACE_NAME . ':' . $productName .
+			PONYDOCS_PRODUCTVERSION_SUFFIX );
 
 		$article = new Article(
-			Title::newFromText( PONYDOCS_DOCUMENTATION_PREFIX . $productName . PONYDOCS_PRODUCTVERSION_SUFFIX ), 0 );
+			Title::newFromText( PONYDOCS_DOCUMENTATION_NAMESPACE_NAME . ':' . $productName .
+			PONYDOCS_PRODUCTVERSION_SUFFIX ), 0 );
 
 		$content = $article->getContent();
 
@@ -445,15 +447,18 @@ class PonyDocsProductVersion {
 	/**
 	 * Returns whether or not a supplied version is defined.
 	 *
-	 * @static 	
-	 * @param string $version Name of version to check.
+	 * @param string $productName
+	 * @param string $versionName Version name OR old-style Version Category tag
 	 * @return boolean
+	 * 
+	 * @static
+	 * @TODO: Remove old-style Version Category tag option, since we no longer use tags like that (so it must be a dead path)
 	 */
-	static public function IsVersion( $productName, $version ) {
-		if ( preg_match( '/^v:(.*)/i', $version, $match ) ) {
-			$version = $match[1];
+	static public function IsVersion( $productName, $versionName ) {
+		if ( preg_match( '/^v:(.*)/i', $versionName, $match ) ) {
+			$versionName = $match[1];
 		}
-		return isset( self::$sVersionMap[$productName][$version] );
+		return isset( self::$sVersionMap[$productName][$versionName] );
 	}
 
 	/**
@@ -553,6 +558,23 @@ class PonyDocsProductVersion {
 			return self::$sVersionListPreview[$productName][sizeof( self::$sVersionListPreview[$productName] ) - 1];
 		}
 		return NULL;
+	}
+
+	/**
+	 * If the Version does not exist, return the latest released Version.
+	 * 
+	 * @param string $productName
+	 * @param string $versionName
+	 * @return PonyDocsProductVersion $version
+	 */
+	static public function getVersionOrLatestReleasedVersion( $productName, $versionName ) {
+		if ( self::IsVersion( $productName, $versionName ) ) {
+			$version = self::$sVersionMap[$productName][$versionName];
+		} else {
+			$version = self::GetLatestReleasedVersion( $productName );
+		}
+		
+		return $version;
 	}
 
 	/**
